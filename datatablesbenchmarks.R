@@ -1,26 +1,12 @@
-install.packages('data.table', repos='http://cran.us.r-project.org')
+
+
 library(data.table)
 library(microbenchmark)
 
 # data sizes
-dat.size <- c(2e6, 2e6 * 5, 2e7, 2e7 *5, 2e8, 2e8 * 5)
+# dat.size <- c(2e6, 2e6 * 5, 2e7, 2e7 *5, 2e8, 2e8 * 5)
 
 test.size <- c(2e2, 2e3)
-
-N <- 2e2; K = 10
-set.seed(1)
-DT <- data.table(
-  id1 = sample(sprintf("id%03d",1:K), N, TRUE),      # large groups (char)
-  id2 = sample(sprintf("id%03d",1:K), N, TRUE),      # large groups (char)
-  id3 = sample(sprintf("id%010d",1:(N/K)), N, TRUE), # small groups (char)
-  id4 = sample(K, N, TRUE),                          # large groups (int)
-  id5 = sample(K, N, TRUE),                          # large groups (int)
-  id6 = sample(N/K, N, TRUE),                        # small groups (int)
-  v1 =  sample(5, N, TRUE),                          # int in range [1,5]
-  v2 =  sample(5, N, TRUE),                          # int in range [1,5]
-  v3 =  sample(round(runif(100,max=100),4), N, TRUE) # numeric e.g. 23.5749
-)
-
 
 micro.list <- vector("list", length = length(test.size))
 for (i in 1:length(test.size)) {
@@ -64,6 +50,8 @@ for (i in 1:length(test.size)) {
   
 }
 
-fwrite(micro.list, "./datatablebenchmark.csv")
+final.results <- do.call(rbind, micro.list)
+
+fwrite(final.results, "~/datatablebenchmark.csv")
 
 
