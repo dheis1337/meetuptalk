@@ -4,8 +4,8 @@ library(microbenchmark)
 
 
 # data sizes
-# dat.size <- c(2e6, 2e6 * 5, 2e7, 2e7 *5, 2e8, 2e8 * 5)
-dat.size <- c(2e4, 2e5)
+dat.size <- c(2e6, 2e6 * 5, 2e7, 2e7 *5, 2e8, 2e8 * 5)
+
 
 micro.list <- vector("list", length = length(dat.size))
 for (i in 1:length(dat.size)) {
