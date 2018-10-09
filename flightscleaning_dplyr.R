@@ -8,10 +8,10 @@ planes <- read_csv("~/MyStuff/DataScience/meetuptalk/airOT201202.csv")
 
 read.data.dplyr <- microbenchmark(read_data_dplyr = {
 # list files in directory
-files <- list.files('~/')
+files <- list.files('~/MyStuff/DataScience/BigData/data/AirOnTimeCSV/', full.names = TRUE)
 
 # lapply read_csv to 
-df.list <- lapply(files, read_csv)
+df.list <- lapply(files[1:5], read_csv)
 
 # combine list of data.frames to one datafrae
 planes <- do.call(rbind, df.list)
@@ -46,11 +46,7 @@ planes <- planes %>% mutate_at(.funs = factor, .vars = c("UNIQUE_CARRIER", "TAIL
 
 # CRS_DEP_TIME, DEP_TIME, CRS_ARR_TIME, ARR_TIME
 planes <- planes %>% mutate_at(.funs = as.numeric, 
-                               .vars = c("UNIQUE_CARRIER", "TAIL_NUM", "FL_NUM", "ORIGIN",
-                                         "DEST", "DEST_STATE_ABR", "ORIGIN_STATE_ABR", 
-                                         "DISTANCE_GROUP", "CANCELLED", "CANCELLATION_CODE",
-                                         "DIVERTED", "ARR_DELAY_GROUP", "ARR_DEL15", "DEP_DEL15",
-                                         "DEP_DELAY_GROUP"))
+                               .vars = c("CRS_DEP_TIME", "DEP_TIME", "CRS_ARR_TIME", "ARR_TIME"))
 }, times = 5, unit = "s")
 
 change.cols.dplyr <- as.data.frame(change.cols.dplyr)
@@ -134,3 +130,6 @@ add.cols.dplyr <- data.frame(expr = add.cols.dplyr$expr[1],
 
 # write file 
 write_csv(add.cols.dplyr, "~/MyStuff/DataScience/meetuptalk/add_cols_dplyr.csv")
+
+planes %>% select(-one_of("ARR_TIME"))
+
