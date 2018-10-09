@@ -1,17 +1,38 @@
 library(data.table)
+library(microbenchmark)
 
 # planes <- fread("C:/MyStuff/DataScience/Projects/BigData/airOT201201 (2).csv")
-# planes <- fread("~/MyStuff/DataScience/meetuptalk/airOT201202.csv")
+planes <- fread("~/MyStuff/DataScience/meetuptalk/airOT201202.csv")
 
+read.data.dt <- microbenchmark(read_data_dt = {
 # get files from directory
 files <- list.files("~/MyStuff/DataScience/BigData/data/AirOnTimeCSV/", full.names = TRUE)
 
 # read in all files
 dt.list <- lapply(files, fread)
 
+
 # collapse list of data.tables into one list
 planes <- rbindlist(dt.list)
 
+}, times = 5, unit = "s")
+
+
+fread('unzip -p ~/MyStuff/DataScience/Bigdata/data/AirOnTimeCSV/flights_test.csv.zip')
+
+# convert to dat.table
+read.data.dt <- data.table(read.data.dt)
+
+# calculate statistics
+read.data.dt <- read.data.dt[, list(mean_time = mean(time  / 1000000000),
+                                  min_time = min(time  / 1000000000),
+                                  median_time = median(time  / 1000000000),
+                                  max_time = max(time  / 1000000000)), by = expr]
+
+# write dt
+fwrite(read.data.dt, '~/')
+
+change.cols.dt <- microbenchmark("change_col_types_datatable" = {
 # change types of columns
 # UNIQUE CARRIER, TAIL_NUM, FL_NUM, ORIGIN, DEST, DEST_STATE_ABR, ORIGIN_STATE_ABR,
 # DISTANCE_GROUP, CANCELLED, CANCELLATION_CODE, DIVERTED, ARR_DELAY_GROUP, ARR_DEL15,
@@ -29,6 +50,22 @@ planes[, c("UNIQUE_CARRIER", "TAIL_NUM", "FL_NUM", "ORIGIN",
 planes[, c("CRS_DEP_TIME", "DEP_TIME", "CRS_ARR_TIME", "ARR_TIME") := lapply(.SD, as.numeric),
         .SDcols = c("CRS_DEP_TIME", "DEP_TIME", "CRS_ARR_TIME", "ARR_TIME")]
 
+}, times = 5, unit = "s")
+
+# create a data.frame
+change.cols.dt <- data.table(change.cols.dt)
+
+# calculate statistics 
+change.cols.dt <- change.cols.dt[, list(mean_time = mean(time  / 1000000000),
+                                  min_time = min(time  / 1000000000),
+                                  median_time = median(time  / 1000000000),
+                                  max_time = max(time  / 1000000000)), by = expr]
+
+# write to file
+fwrite(change.cols.dt, "~/")
+
+
+add.cols.dt <- microbenchmark(add_cols_dt = { 
 # add a few columns
 planes[, c("ARR_LATE_FLAG", "ARR_EARLY_FLAG", "DEP_EARLY_FLAG", "DEP_LATE_FLAG",
            "DEP_EARLY_MINS", "ARR_EARLY_MINS", "DEP_DELAY_SQ", "DEP_DELAY_CUBE",
@@ -90,5 +127,17 @@ planes[, c("ARR_EARLY_MINS_DISTANCE", "ARR_EARLY_MINS_ELAPSED_TIME",
               DEP_EARLY_MINS * ARR_DELAY_CUBE,
               DEP_EARLY_MINS * ARR_DELAY_QUAR)]
 
+}, times = 5, unit = "s")
 
+# create a data.frame
+add.cols.dt <- data.table(add.cols.dt)
+
+# calculate statistics 
+add.cols.dt <- add.cols.dt[, list(mean_time = mean(time  / 1000000000),
+                   min_time = min(time  / 1000000000),
+                   median_time = median(time  / 1000000000),
+                   max_time = max(time  / 1000000000)), by = expr]
+
+# write to file
+fwrite(add.cols.dt, "~/")
 
